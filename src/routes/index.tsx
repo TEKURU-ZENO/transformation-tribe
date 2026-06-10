@@ -85,8 +85,12 @@ function FloatingCard({
 }) {
   return (
     <div
-      className={`glass-card absolute rounded-xl p-4 shadow-2xl ${className}`}
+      className={`absolute rounded-xl p-4 shadow-2xl ${className}`}
       style={{
+        background: "oklch(0.205 0.018 264 / 60%)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1px solid oklch(1 0 0 / 8%)",
         animation: "float 6s ease-in-out infinite",
         animationDelay: `${delay}s`,
       }}
