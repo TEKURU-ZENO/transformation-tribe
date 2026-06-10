@@ -201,7 +201,11 @@ function Index() {
           </p>
 
           <h1 className="mx-auto max-w-[18ch] text-5xl font-extrabold leading-[0.95] tracking-tight text-foreground sm:text-7xl lg:text-[7rem] text-balance">
-            Friends don&apos;t let friends quit.
+            Friends don&apos;t let friends{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald to-gold">
+              quit
+            </span>
+            .
           </h1>
 
           <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg text-balance">
