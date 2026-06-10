@@ -158,7 +158,7 @@ function Index() {
             <p className="mt-1 text-xs text-foreground font-medium">+45 XP earned</p>
           </FloatingCard>
 
-          <FloatingCard className="bottom-[28%] right-[10%] w-56 rotate-[4deg] opacity-40 sm:opacity-100" delay={2}>
+          <FloatingCard className="bottom-[28%] right-[10%] w-56 rotate-[4deg] opacity-50 sm:opacity-100" delay={2}>
             <div className="flex items-center gap-3">
               <div className="grid h-8 w-8 place-items-center rounded-full border border-gold/30 bg-gold/10">
                 <Trophy className="h-4 w-4 text-gold" />
