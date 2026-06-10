@@ -135,8 +135,14 @@ function Index() {
 
       {/* ─── Hero Section ─── */}
       <section ref={heroRef} className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-20">
-        {/* Floating Background Cards */}
+        {/* Ambient background glows */}
         <div className="pointer-events-none absolute inset-0 z-0">
+          <div className="absolute top-[30%] left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-emerald/[0.025] blur-[120px]" />
+          <div className="absolute bottom-[20%] right-[20%] h-[400px] w-[600px] rounded-full bg-gold/[0.015] blur-[100px]" />
+        </div>
+
+        {/* Floating Background Cards */}
+        <div className="pointer-events-none absolute inset-0 z-[1]">
           <FloatingCard className="top-[18%] left-[8%] w-52 rotate-[-6deg] opacity-50 sm:opacity-100" delay={0}>
             <div className="mb-2 h-1.5 w-full rounded-full bg-white/10">
               <div
