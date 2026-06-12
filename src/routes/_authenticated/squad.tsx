@@ -119,15 +119,19 @@ function SquadPage() {
           <div key={squad.id} className="glass-card rounded-2xl p-6">
             <div className="flex items-baseline justify-between mb-5 flex-wrap gap-2">
               <h2 className="text-xl font-bold">{squad.name}</h2>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(squad.invite_code);
-                  toast.success("Invite code copied");
-                }}
-                className="text-xs font-mono px-3 py-1 rounded-full bg-emerald/10 text-emerald hover:bg-emerald/20 flex items-center gap-1.5"
-              >
-                <Copy className="h-3 w-3" /> {squad.invite_code}
-              </button>
+              {squad.owner_id === user?.id && (
+                <button
+                  onClick={async () => {
+                    const { data, error } = await supabase.rpc("get_squad_invite_code", { _squad_id: squad.id });
+                    if (error || !data) return toast.error("Couldn't fetch invite code");
+                    await navigator.clipboard.writeText(String(data));
+                    toast.success(`Invite code copied: ${data}`);
+                  }}
+                  className="text-xs font-mono px-3 py-1 rounded-full bg-emerald/10 text-emerald hover:bg-emerald/20 flex items-center gap-1.5"
+                >
+                  <Copy className="h-3 w-3" /> Copy invite code
+                </button>
+              )}
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {membersQ.data?.profiles
