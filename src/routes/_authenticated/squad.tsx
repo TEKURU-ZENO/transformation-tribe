@@ -9,7 +9,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Trophy, Users, Plus, Copy } from "lucide-react";
+import { Trophy, Users, Plus, Copy, Link2 } from "lucide-react";
+import { generateSquadKey, storeSquadKey, getSquadKey, inviteLink } from "@/lib/squadCrypto";
 
 export const Route = createFileRoute("/_authenticated/squad")({
   component: SquadPage,
@@ -58,8 +59,12 @@ function SquadPage() {
     const { data, error } = await supabase.rpc("create_squad", { _name: newName.trim() });
     if (error) return toast.error(error.message);
     const row = Array.isArray(data) ? data[0] : data;
+    if (row?.id) {
+      const key = await generateSquadKey();
+      storeSquadKey(row.id, key);
+    }
     setNewName("");
-    toast.success(`Squad created. Invite code: ${row?.invite_code ?? ""}`);
+    toast.success(`Squad created — open the squad to copy your invite link.`);
     squadsQ.refetch();
   }
 
