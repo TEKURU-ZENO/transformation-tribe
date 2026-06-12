@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { takePendingInvite } from "@/lib/squadCrypto";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Enter the Guild — ASCEND" }] }),
@@ -23,7 +24,11 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/dashboard" });
+      if (data.user) {
+        const pending = takePendingInvite();
+        if (pending) navigate({ to: "/join/$code", params: { code: pending.code } });
+        else navigate({ to: "/dashboard" });
+      }
     });
   }, [navigate]);
 
@@ -46,7 +51,9 @@ function AuthPage() {
         if (error) throw error;
       }
       toast.success("Welcome to the guild");
-      navigate({ to: "/dashboard" });
+      const pending = takePendingInvite();
+      if (pending) navigate({ to: "/join/$code", params: { code: pending.code } });
+      else navigate({ to: "/dashboard" });
     } catch (err: any) {
       toast.error(err.message ?? "Something went wrong");
     } finally {

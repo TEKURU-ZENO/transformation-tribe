@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as JoinCodeRouteImport } from './routes/join.$code'
 import { Route as AuthenticatedTodayRouteImport } from './routes/_authenticated/today'
 import { Route as AuthenticatedSquadRouteImport } from './routes/_authenticated/squad'
 import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
@@ -31,6 +32,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinCodeRoute = JoinCodeRouteImport.update({
+  id: '/join/$code',
+  path: '/join/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedTodayRoute = AuthenticatedTodayRouteImport.update({
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/planner': typeof AuthenticatedPlannerRoute
   '/squad': typeof AuthenticatedSquadRoute
   '/today': typeof AuthenticatedTodayRoute
+  '/join/$code': typeof JoinCodeRoute
   '/profile/$userId': typeof AuthenticatedProfileUserIdRoute
 }
 export interface FileRoutesByTo {
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/planner': typeof AuthenticatedPlannerRoute
   '/squad': typeof AuthenticatedSquadRoute
   '/today': typeof AuthenticatedTodayRoute
+  '/join/$code': typeof JoinCodeRoute
   '/profile/$userId': typeof AuthenticatedProfileUserIdRoute
 }
 export interface FileRoutesById {
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/_authenticated/planner': typeof AuthenticatedPlannerRoute
   '/_authenticated/squad': typeof AuthenticatedSquadRoute
   '/_authenticated/today': typeof AuthenticatedTodayRoute
+  '/join/$code': typeof JoinCodeRoute
   '/_authenticated/profile/$userId': typeof AuthenticatedProfileUserIdRoute
 }
 export interface FileRouteTypes {
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/planner'
     | '/squad'
     | '/today'
+    | '/join/$code'
     | '/profile/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/planner'
     | '/squad'
     | '/today'
+    | '/join/$code'
     | '/profile/$userId'
   id:
     | '__root__'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/_authenticated/planner'
     | '/_authenticated/squad'
     | '/_authenticated/today'
+    | '/join/$code'
     | '/_authenticated/profile/$userId'
   fileRoutesById: FileRoutesById
 }
@@ -135,6 +147,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  JoinCodeRoute: typeof JoinCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join/$code': {
+      id: '/join/$code'
+      path: '/join/$code'
+      fullPath: '/join/$code'
+      preLoaderRoute: typeof JoinCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/today': {
@@ -230,6 +250,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  JoinCodeRoute: JoinCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/lib/useAuthUser";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Clock } from "lucide-react";
+import { Send, Clock, Lock } from "lucide-react";
+import { encryptText, decryptText, getSquadKey } from "@/lib/squadCrypto";
 
 export const Route = createFileRoute("/_authenticated/chat")({
   component: Chat,
@@ -50,7 +51,11 @@ function Chat() {
         .select("*, profiles(name)")
         .eq("squad_id", activeSquad!)
         .order("created_at");
-      return data ?? [];
+      const rows = data ?? [];
+      const decrypted = await Promise.all(
+        rows.map(async (m: any) => ({ ...m, content: await decryptText(activeSquad!, m.content) })),
+      );
+      return decrypted;
     },
   });
 
@@ -70,7 +75,11 @@ function Chat() {
   async function send(e: React.FormEvent) {
     e.preventDefault();
     if (!text.trim() || !user || !activeSquad) return;
-    await supabase.from("messages").insert({ squad_id: activeSquad, user_id: user.id, content: text.trim() });
+    if (!getSquadKey(activeSquad)) {
+      return alert("No encryption key on this device for this squad. Ask the owner to share the invite link.");
+    }
+    const payload = await encryptText(activeSquad, text.trim());
+    await supabase.from("messages").insert({ squad_id: activeSquad, user_id: user.id, content: payload });
     setText("");
   }
 
@@ -87,8 +96,9 @@ function Chat() {
       <div className="mb-4 flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold">Guild Chat</h1>
-          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-            <Clock className="h-3 w-3" /> Messages disappear after 24 hours
+          <p className="text-xs text-muted-foreground flex items-center gap-3 mt-1">
+            <span className="flex items-center gap-1"><Lock className="h-3 w-3" /> End-to-end encrypted</span>
+            <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> Disappears after 24h</span>
           </p>
         </div>
         {squadsQ.data && squadsQ.data.length > 1 && (
