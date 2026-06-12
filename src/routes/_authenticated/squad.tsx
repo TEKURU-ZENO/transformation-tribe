@@ -55,28 +55,20 @@ function SquadPage() {
 
   async function createSquad() {
     if (!newName.trim() || !user) return;
-    const { data, error } = await supabase
-      .from("squads")
-      .insert({ name: newName.trim(), owner_id: user.id })
-      .select()
-      .single();
+    const { data, error } = await supabase.rpc("create_squad", { _name: newName.trim() });
     if (error) return toast.error(error.message);
-    await supabase.from("squad_members").insert({ squad_id: data!.id, user_id: user.id });
+    const row = Array.isArray(data) ? data[0] : data;
     setNewName("");
-    toast.success(`Squad created. Invite code: ${data!.invite_code}`);
+    toast.success(`Squad created. Invite code: ${row?.invite_code ?? ""}`);
     squadsQ.refetch();
   }
 
   async function joinSquad() {
     if (!joinCode.trim() || !user) return;
-    const { data: squad, error } = await supabase
-      .from("squads")
-      .select("id,name")
-      .eq("invite_code", joinCode.trim().toUpperCase())
-      .maybeSingle();
-    if (error || !squad) return toast.error("Invalid invite code");
-    const { error: joinErr } = await supabase.from("squad_members").insert({ squad_id: squad.id, user_id: user.id });
-    if (joinErr) return toast.error(joinErr.message);
+    const { data, error } = await supabase.rpc("join_squad_by_code", { _code: joinCode.trim() });
+    if (error) return toast.error(error.message);
+    const squad = Array.isArray(data) ? data[0] : data;
+    if (!squad) return toast.error("Invalid invite code");
     setJoinCode("");
     toast.success(`Joined ${squad.name}`);
     squadsQ.refetch();
