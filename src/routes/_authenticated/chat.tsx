@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, Clock, Lock } from "lucide-react";
 import { encryptText, decryptText, getSquadKey } from "@/lib/squadCrypto";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/chat")({
   component: Chat,
@@ -76,7 +77,7 @@ function Chat() {
     e.preventDefault();
     if (!text.trim() || !user || !activeSquad) return;
     if (!getSquadKey(activeSquad)) {
-      return alert("No encryption key on this device for this squad. Ask the owner to share the invite link.");
+      return toast.error("No encryption key on this device. Ask the owner for the invite link.");
     }
     const payload = await encryptText(activeSquad, text.trim());
     await supabase.from("messages").insert({ squad_id: activeSquad, user_id: user.id, content: payload });
