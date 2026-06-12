@@ -125,17 +125,35 @@ function SquadPage() {
             <div className="flex items-baseline justify-between mb-5 flex-wrap gap-2">
               <h2 className="text-xl font-bold">{squad.name}</h2>
               {squad.owner_id === user?.id && (
-                <button
-                  onClick={async () => {
-                    const { data, error } = await supabase.rpc("get_squad_invite_code", { _squad_id: squad.id });
-                    if (error || !data) return toast.error("Couldn't fetch invite code");
-                    await navigator.clipboard.writeText(String(data));
-                    toast.success(`Invite code copied: ${data}`);
-                  }}
-                  className="text-xs font-mono px-3 py-1 rounded-full bg-emerald/10 text-emerald hover:bg-emerald/20 flex items-center gap-1.5"
-                >
-                  <Copy className="h-3 w-3" /> Copy invite code
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      const { data, error } = await supabase.rpc("get_squad_invite_code", { _squad_id: squad.id });
+                      if (error || !data) return toast.error("Couldn't fetch invite code");
+                      const localKey = getSquadKey(squad.id);
+                      if (!localKey) {
+                        await navigator.clipboard.writeText(String(data));
+                        return toast.message("Copied code (no encryption key on this device — link unavailable)");
+                      }
+                      await navigator.clipboard.writeText(inviteLink(String(data), localKey));
+                      toast.success("Invite link copied");
+                    }}
+                    className="text-xs px-3 py-1 rounded-full bg-emerald/10 text-emerald hover:bg-emerald/20 flex items-center gap-1.5"
+                  >
+                    <Link2 className="h-3 w-3" /> Copy invite link
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const { data, error } = await supabase.rpc("get_squad_invite_code", { _squad_id: squad.id });
+                      if (error || !data) return toast.error("Couldn't fetch invite code");
+                      await navigator.clipboard.writeText(String(data));
+                      toast.success(`Code copied: ${data}`);
+                    }}
+                    className="text-xs font-mono px-3 py-1 rounded-full bg-white/[0.04] hover:bg-white/[0.08] flex items-center gap-1.5"
+                  >
+                    <Copy className="h-3 w-3" /> Code only
+                  </button>
+                </div>
               )}
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
