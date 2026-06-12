@@ -191,9 +191,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_squad: {
+        Args: { _name: string }
+        Returns: {
+          id: string
+          invite_code: string
+          name: string
+        }[]
+      }
+      get_squad_invite_code: { Args: { _squad_id: string }; Returns: string }
       is_squad_member: {
         Args: { _squad: string; _user: string }
         Returns: boolean
+      }
+      join_squad_by_code: {
+        Args: { _code: string }
+        Returns: {
+          id: string
+          name: string
+        }[]
       }
       shares_squad_with: { Args: { _a: string; _b: string }; Returns: boolean }
     }

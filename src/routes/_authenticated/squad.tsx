@@ -55,28 +55,20 @@ function SquadPage() {
 
   async function createSquad() {
     if (!newName.trim() || !user) return;
-    const { data, error } = await supabase
-      .from("squads")
-      .insert({ name: newName.trim(), owner_id: user.id })
-      .select()
-      .single();
+    const { data, error } = await supabase.rpc("create_squad", { _name: newName.trim() });
     if (error) return toast.error(error.message);
-    await supabase.from("squad_members").insert({ squad_id: data!.id, user_id: user.id });
+    const row = Array.isArray(data) ? data[0] : data;
     setNewName("");
-    toast.success(`Squad created. Invite code: ${data!.invite_code}`);
+    toast.success(`Squad created. Invite code: ${row?.invite_code ?? ""}`);
     squadsQ.refetch();
   }
 
   async function joinSquad() {
     if (!joinCode.trim() || !user) return;
-    const { data: squad, error } = await supabase
-      .from("squads")
-      .select("id,name")
-      .eq("invite_code", joinCode.trim().toUpperCase())
-      .maybeSingle();
-    if (error || !squad) return toast.error("Invalid invite code");
-    const { error: joinErr } = await supabase.from("squad_members").insert({ squad_id: squad.id, user_id: user.id });
-    if (joinErr) return toast.error(joinErr.message);
+    const { data, error } = await supabase.rpc("join_squad_by_code", { _code: joinCode.trim() });
+    if (error) return toast.error(error.message);
+    const squad = Array.isArray(data) ? data[0] : data;
+    if (!squad) return toast.error("Invalid invite code");
     setJoinCode("");
     toast.success(`Joined ${squad.name}`);
     squadsQ.refetch();
@@ -127,15 +119,19 @@ function SquadPage() {
           <div key={squad.id} className="glass-card rounded-2xl p-6">
             <div className="flex items-baseline justify-between mb-5 flex-wrap gap-2">
               <h2 className="text-xl font-bold">{squad.name}</h2>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(squad.invite_code);
-                  toast.success("Invite code copied");
-                }}
-                className="text-xs font-mono px-3 py-1 rounded-full bg-emerald/10 text-emerald hover:bg-emerald/20 flex items-center gap-1.5"
-              >
-                <Copy className="h-3 w-3" /> {squad.invite_code}
-              </button>
+              {squad.owner_id === user?.id && (
+                <button
+                  onClick={async () => {
+                    const { data, error } = await supabase.rpc("get_squad_invite_code", { _squad_id: squad.id });
+                    if (error || !data) return toast.error("Couldn't fetch invite code");
+                    await navigator.clipboard.writeText(String(data));
+                    toast.success(`Invite code copied: ${data}`);
+                  }}
+                  className="text-xs font-mono px-3 py-1 rounded-full bg-emerald/10 text-emerald hover:bg-emerald/20 flex items-center gap-1.5"
+                >
+                  <Copy className="h-3 w-3" /> Copy invite code
+                </button>
+              )}
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {membersQ.data?.profiles
