@@ -82,10 +82,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "The shared growth operating system for ambitious people. Plan your week, track daily progress, gain XP, and grow together." },
       { name: "author", content: "ASCEND" },
       { property: "og:title", content: "ASCEND — Social Growth Operating System" },
-      { property: "og:description", content: "Friends don't let friends quit. Track transformation, build momentum, compete with your squad." },
+      { property: "og:description", content: "The shared growth operating system for ambitious people. Plan your week, track daily progress, gain XP, and grow together." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ascend" },
+      { name: "twitter:title", content: "ASCEND — Social Growth Operating System" },
+      { name: "twitter:description", content: "The shared growth operating system for ambitious people. Plan your week, track daily progress, gain XP, and grow together." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d6967c11-261e-46b1-8b46-78db55964e4d/id-preview-fdc3432c--80209704-1681-435f-9951-2d4526635ff0.lovable.app-1781333047828.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d6967c11-261e-46b1-8b46-78db55964e4d/id-preview-fdc3432c--80209704-1681-435f-9951-2d4526635ff0.lovable.app-1781333047828.png" },
     ],
     links: [
       {
