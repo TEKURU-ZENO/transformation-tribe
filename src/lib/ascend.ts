@@ -8,31 +8,16 @@ export function levelForXp(xp: number) {
 }
 
 export async function completeTask(taskId: string, xp: number, title: string) {
-  const { data: userData } = await supabase.auth.getUser();
-  const uid = userData.user?.id;
-  if (!uid) throw new Error("Not signed in");
-
-  const { error } = await supabase
-    .from("tasks")
-    .update({ completed: true, completed_at: new Date().toISOString() })
-    .eq("id", taskId);
+  void xp;
+  void title;
+  const { error } = await supabase.rpc("complete_task", { _task_id: taskId });
   if (error) throw error;
-
-  const { data: profile } = await supabase.from("profiles").select("xp").eq("id", uid).single();
-  const newXp = (profile?.xp ?? 0) + xp;
-  const newLevel = levelForXp(newXp);
-  await supabase.from("profiles").update({ xp: newXp, level: newLevel }).eq("id", uid);
-  await supabase.from("activities").insert({ user_id: uid, emoji: "⚡", message: `completed ${title}` });
 }
 
 export async function uncompleteTask(taskId: string, xp: number) {
-  const { data: userData } = await supabase.auth.getUser();
-  const uid = userData.user?.id;
-  if (!uid) return;
-  await supabase.from("tasks").update({ completed: false, completed_at: null }).eq("id", taskId);
-  const { data: profile } = await supabase.from("profiles").select("xp").eq("id", uid).single();
-  const newXp = Math.max(0, (profile?.xp ?? 0) - xp);
-  await supabase.from("profiles").update({ xp: newXp, level: levelForXp(newXp) }).eq("id", uid);
+  void xp;
+  const { error } = await supabase.rpc("uncomplete_task", { _task_id: taskId });
+  if (error) throw error;
 }
 
 export function todayISO() {
