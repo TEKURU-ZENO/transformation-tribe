@@ -25,10 +25,12 @@ function SquadPage() {
     queryKey: ["squads", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data: links } = await supabase.from("squad_members").select("squad_id").eq("user_id", user!.id);
+      const { data: links, error: linksError } = await supabase.from("squad_members").select("squad_id").eq("user_id", user!.id);
+      if (linksError) throw linksError;
       const ids = links?.map((l) => l.squad_id) ?? [];
       if (!ids.length) return [];
-      const { data: squads } = await supabase.from("squads").select("*").in("id", ids);
+      const { data: squads, error: squadsError } = await supabase.from("squads").select("*").in("id", ids);
+      if (squadsError) throw squadsError;
       return squads ?? [];
     },
   });
@@ -38,13 +40,16 @@ function SquadPage() {
     enabled: !!squadsQ.data?.length,
     queryFn: async () => {
       const sids = squadsQ.data!.map((s) => s.id);
-      const { data: members } = await supabase.from("squad_members").select("*").in("squad_id", sids);
+      const { data: members, error: membersError } = await supabase.from("squad_members").select("*").in("squad_id", sids);
+      if (membersError) throw membersError;
       const uids = Array.from(new Set((members ?? []).map((m) => m.user_id)));
-      const { data: profs } = await supabase.from("profiles").select("*").in("id", uids);
+      const { data: profs, error: profsError } = await supabase.from("profiles").select("*").in("id", uids);
+      if (profsError) throw profsError;
       const start = new Date();
       start.setDate(start.getDate() - start.getDay());
       const startISO = start.toISOString().slice(0, 10);
-      const { data: tasks } = await supabase.from("tasks").select("user_id,completed").in("user_id", uids).gte("date", startISO);
+      const { data: tasks, error: tasksError } = await supabase.from("tasks").select("user_id,completed").in("user_id", uids).gte("date", startISO);
+      if (tasksError) throw tasksError;
       const rows = (profs ?? []).map((p) => {
         const t = (tasks ?? []).filter((x) => x.user_id === p.id);
         const pct = t.length ? Math.round((t.filter((x) => x.completed).length / t.length) * 100) : 0;
@@ -65,7 +70,7 @@ function SquadPage() {
     }
     setNewName("");
     toast.success(`Squad created — open the squad to copy your invite link.`);
-    squadsQ.refetch();
+    squadsQ.refetch().catch(() => undefined);
   }
 
   async function joinSquad() {
