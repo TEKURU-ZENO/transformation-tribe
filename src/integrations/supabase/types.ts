@@ -191,6 +191,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      complete_task: {
+        Args: { _task_id: string }
+        Returns: {
+          new_level: number
+          new_xp: number
+        }[]
+      }
       create_squad: {
         Args: { _name: string }
         Returns: {
@@ -212,6 +219,13 @@ export type Database = {
         }[]
       }
       shares_squad_with: { Args: { _a: string; _b: string }; Returns: boolean }
+      uncomplete_task: {
+        Args: { _task_id: string }
+        Returns: {
+          new_level: number
+          new_xp: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
